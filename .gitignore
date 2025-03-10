@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Custom
+extlibs/
+
 # User-specific files
 *.rsuser
 *.suo
@@ -99,6 +102,10 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
+*.sln
+*.vcxproj
+*.filters
+*.user
 
 # Chutzpah Test files
 _Chutzpah*
