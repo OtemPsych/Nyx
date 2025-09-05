@@ -1,9 +1,9 @@
 #pragma once
 
 #ifdef NDEBUG
-  constexpr bool NYX_DEBUG = false;
+  constexpr bool nyx_dbg = false;
 #else
-  constexpr bool NYX_DEBUG = true;
+  constexpr bool nyx_dbg = true;
 #endif // NDEBUG
 
 // Differentiate between static and dynamic linking

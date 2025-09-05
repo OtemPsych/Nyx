@@ -45,4 +45,4 @@ target_link_libraries(NyxEngine
 )
 target_sources(NyxEngine PRIVATE
   src/NyxEngine.cpp
-)
+ "include/nyx/core/config.h" "include/nyx/core/assert.h")
