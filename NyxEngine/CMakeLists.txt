@@ -44,5 +44,4 @@ target_link_libraries(NyxEngine
   PRIVATE glfw
 )
 target_sources(NyxEngine PRIVATE
-  src/NyxEngine.cpp
- "include/nyx/core/config.h" "include/nyx/core/assert.h")
+ "include/nyx/core/config.h" "include/nyx/core/assert.h" "include/nyx/core/logging/log.h" "src/core/logging/log.cpp")
