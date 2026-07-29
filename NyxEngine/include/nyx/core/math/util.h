@@ -14,6 +14,9 @@ namespace nyx {
 template <typename T> concept Arithmetic = std::is_arithmetic_v<T>;
 template <typename T> concept Signed = std::is_signed_v<T>;
 
+template <std::floating_point T> [[nodiscard]] constexpr bool signbit(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T copysign(T mag, T sgn) noexcept;
+
 template <std::floating_point T> [[nodiscard]] constexpr bool isnan(T val) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr bool isinf(T val) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr bool isnormal(T val) noexcept;
@@ -45,6 +48,9 @@ template <std::floating_point T> [[nodiscard]] constexpr T pow(T x, T y) noexcep
 
 namespace detail {
 
+template <std::floating_point T> [[nodiscard]] consteval bool signbit_impl(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T copysign_impl(T mag, T sng) noexcept;
+
 template <std::floating_point T> [[nodiscard]] consteval bool isinf_impl(T val) noexcept;
 
 template <std::floating_point T> [[nodiscard]] consteval T sqrt_impl(T x) noexcept;
@@ -70,6 +76,21 @@ template <std::floating_point T> [[nodiscard]] consteval T pow_impl(T x, T y) no
 } // namespace nyx
 
 namespace nyx {
+
+template <std::floating_point T> constexpr bool signbit(T x) noexcept {
+    if consteval {
+        return detail::signbit_impl(x);
+    } else {
+        return std::signbit(x);
+    }
+}
+template <std::floating_point T> constexpr T copysign(T mag, T sgn) noexcept {
+    if consteval {
+        return detail::copysign_impl(mag, sgn);
+    } else {
+        return std::copysign(mag, sgn);
+    }
+}
 
 template <std::floating_point T> constexpr bool isnan(T val) noexcept {
     if consteval {
@@ -130,7 +151,14 @@ template <std::floating_point T> constexpr T sqrt(T x) noexcept {
 }
 
 template <std::floating_point T> constexpr T rsqrt(T x) noexcept {
-    // IEEE-754 division by 0.0 or -0.0 naturally yields +inf or -inf respectively, and division by NaN yields NaN.
+    if consteval {
+        if (x == T{0}) {
+            return copysign(std::numeric_limits<T>::infinity(), x);
+        }
+        if (x < T{0}) {
+            return std::numeric_limits<T>::quiet_NaN();
+        }
+    }
     return T{1} / sqrt(x);
 }
 
@@ -223,6 +251,34 @@ template <std::floating_point T> constexpr T pow(T x, T y) noexcept {
 }
 
 namespace detail {
+
+template <std::floating_point T> consteval bool signbit_impl(T x) noexcept {
+    using Storage = std::array<std::uint8_t, sizeof(T)>;
+    const auto bytes{std::bit_cast<Storage>(x)};
+
+    constexpr std::uint8_t sign_mask{1 << 7};
+
+    if constexpr (std::endian::native == std::endian::little) {
+        return (bytes.back() & sign_mask) != 0;
+    } else {
+        return (bytes.front() & sign_mask) != 0;
+    }
+}
+
+template <std::floating_point T> consteval T copysign_impl(T mag, T sgn) noexcept {
+    using Storage = std::array<std::uint8_t, sizeof(T)>;
+    auto mag_bytes{std::bit_cast<Storage>(mag)};
+    const auto sgn_bytes{std::bit_cast<Storage>(sgn)};
+
+    constexpr std::uint8_t sign_mask{1 << 7};
+
+    if constexpr (std::endian::native == std::endian::little) {
+        mag_bytes.back() = (mag_bytes.back() & ~sign_mask) | (sgn_bytes.back() & sign_mask);
+    } else {
+        mag_bytes.front() = (mag_bytes.front() & ~sign_mask) | (sgn_bytes.front() & sign_mask);
+    }
+    return std::bit_cast<T>(mag_bytes);
+}
 
 template <std::floating_point T> consteval bool isinf_impl(T val) noexcept {
     if constexpr (std::numeric_limits<T>::has_infinity) {
@@ -344,11 +400,8 @@ template <std::floating_point T> consteval T asin_impl(T x) noexcept {
     if (x < T{-1} || x > T{1}) {
         return std::numeric_limits<T>::quiet_NaN();
     }
-    if (x == T{1}) {
-        return std::numbers::pi_v<T> / 2;
-    }
-    if (x == T{-1}) {
-        return -std::numbers::pi_v<T> / 2;
+    if (abs(x) == T{1}) {
+        return copysign(std::numbers::pi_v<T> / 2, x);
     }
     return atan(x / sqrt(T{1} - x * x));
 }
