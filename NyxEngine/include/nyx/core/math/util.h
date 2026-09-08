@@ -28,9 +28,6 @@ template <Scalar T> [[nodiscard]] constexpr T clamp(T val, T min_val, T max_val)
 template <std::floating_point T>
 [[nodiscard]] constexpr bool approx_equal(T a, T b, std::uint_fast32_t max_ulp_factor = 100) noexcept;
 
-template <std::floating_point T> [[nodiscard]] constexpr T radians(T deg) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T degrees(T rad) noexcept;
-
 template <std::floating_point T> [[nodiscard]] constexpr T sqrt(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr T rsqrt(T x) noexcept;
 
@@ -162,10 +159,6 @@ template <std::floating_point T> constexpr bool approx_equal(T a, T b, std::uint
     const T norm{max(abs(a), abs(b))};
     return diff < (norm * std::numeric_limits<T>::epsilon() * max_ulp_factor);
 }
-
-template <std::floating_point T> constexpr T radians(T deg) noexcept { return deg * (std::numbers::pi_v<T> / T{180}); }
-
-template <std::floating_point T> constexpr T degrees(T rad) noexcept { return rad * (T{180} / std::numbers::pi_v<T>); }
 
 template <std::floating_point T> constexpr T sqrt(T x) noexcept {
     if consteval {
