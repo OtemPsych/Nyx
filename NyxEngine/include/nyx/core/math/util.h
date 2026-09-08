@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <cmath>
@@ -8,23 +9,28 @@
 #include <limits>
 #include <numbers>
 
-#include <nyx/core/traits.h>
-
 namespace nyx {
 
-template <SignedScalar T> [[nodiscard]] constexpr T abs(T x) noexcept;
+namespace traits {
+
+template <typename T> concept Scalar = (std::integral<T> || std::floating_point<T>) && !std::same_as<T, bool>;
+template <typename T> concept SignedScalar = std::signed_integral<T> || std::floating_point<T>;
+
+} // namespace traits
+
+template <traits::SignedScalar T> [[nodiscard]] constexpr T abs(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr T fmod(T x, T y) noexcept;
 
-template <SignedScalar T> [[nodiscard]] constexpr bool signbit(T x) noexcept;
-template <SignedScalar T> [[nodiscard]] constexpr T copysign(T mag, T sgn) noexcept;
+template <traits::SignedScalar T> [[nodiscard]] constexpr bool signbit(T x) noexcept;
+template <traits::SignedScalar T> [[nodiscard]] constexpr T copysign(T mag, T sgn) noexcept;
 
 template <std::floating_point T> [[nodiscard]] constexpr bool isnan(T val) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr bool isinf(T val) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr bool isnormal(T val) noexcept;
 
-template <Scalar T> [[nodiscard]] constexpr T min(T v0, T v1) noexcept;
-template <Scalar T> [[nodiscard]] constexpr T max(T v0, T v1) noexcept;
-template <Scalar T> [[nodiscard]] constexpr T clamp(T val, T min_val, T max_val) noexcept;
+template <traits::Scalar T> [[nodiscard]] constexpr T min(T v0, T v1) noexcept;
+template <traits::Scalar T> [[nodiscard]] constexpr T max(T v0, T v1) noexcept;
+template <traits::Scalar T> [[nodiscard]] constexpr T clamp(T val, T min_val, T max_val) noexcept;
 template <std::floating_point T>
 [[nodiscard]] constexpr bool approx_equal(T a, T b, std::uint_fast32_t max_ulp_factor = 100) noexcept;
 
@@ -52,8 +58,8 @@ namespace detail {
 
 template <std::floating_point T> [[nodiscard]] consteval T fmod_impl(T x, T y) noexcept;
 
-template <SignedScalar T> [[nodiscard]] consteval bool signbit_impl(T x) noexcept;
-template <SignedScalar T> [[nodiscard]] consteval T copysign_impl(T mag, T sgn) noexcept;
+template <traits::SignedScalar T> [[nodiscard]] consteval bool signbit_impl(T x) noexcept;
+template <traits::SignedScalar T> [[nodiscard]] consteval T copysign_impl(T mag, T sgn) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval bool isinf_impl(T val) noexcept;
 
 template <std::floating_point T> [[nodiscard]] consteval T sqrt_impl(T x) noexcept;
@@ -80,7 +86,7 @@ template <std::floating_point T> [[nodiscard]] consteval T reduce_pi(T x) noexce
 
 } // namespace detail
 
-template <SignedScalar T> constexpr T abs(T x) noexcept {
+template <traits::SignedScalar T> constexpr T abs(T x) noexcept {
     if consteval {
         return x < T{0} ? -x : x;
     }
@@ -94,14 +100,14 @@ template <std::floating_point T> constexpr T fmod(T x, T y) noexcept {
     return std::fmod(x, y);
 }
 
-template <SignedScalar T> constexpr bool signbit(T x) noexcept {
+template <traits::SignedScalar T> constexpr bool signbit(T x) noexcept {
     if consteval {
         return detail::signbit_impl(x);
     }
     return std::signbit(x);
 }
 
-template <SignedScalar T> constexpr T copysign(T mag, T sgn) noexcept {
+template <traits::SignedScalar T> constexpr T copysign(T mag, T sgn) noexcept {
     if consteval {
         return detail::copysign_impl(mag, sgn);
     }
@@ -129,21 +135,21 @@ template <std::floating_point T> constexpr bool isnormal(T val) noexcept {
     return std::isnormal(val);
 }
 
-template <Scalar T> constexpr T min(T v0, T v1) noexcept {
+template <traits::Scalar T> constexpr T min(T v0, T v1) noexcept {
     if consteval {
         return v0 < v1 ? v0 : v1;
     }
     return std::min(v0, v1);
 }
 
-template <Scalar T> constexpr T max(T v0, T v1) noexcept {
+template <traits::Scalar T> constexpr T max(T v0, T v1) noexcept {
     if consteval {
         return v0 > v1 ? v0 : v1;
     }
     return std::max(v0, v1);
 }
 
-template <Scalar T> constexpr T clamp(T val, T min_val, T max_val) noexcept {
+template <traits::Scalar T> constexpr T clamp(T val, T min_val, T max_val) noexcept {
     if consteval {
         return max(min(val, max_val), min_val);
     }
@@ -157,7 +163,7 @@ template <std::floating_point T> constexpr bool approx_equal(T a, T b, std::uint
 
     const T diff{abs(a - b)};
     const T norm{max(abs(a), abs(b))};
-    return diff < (norm * std::numeric_limits<T>::epsilon() * max_ulp_factor);
+    return diff < (norm * std::numeric_limits<T>::epsilon() * static_cast<T>(max_ulp_factor));
 }
 
 template <std::floating_point T> constexpr T sqrt(T x) noexcept {
@@ -284,7 +290,7 @@ template <std::floating_point T> consteval T fmod_impl(T x, T y) noexcept {
     return copysign(abs_x - trunc(abs_x / abs_y) * abs_y, x);
 }
 
-template <SignedScalar T> consteval bool signbit_impl(T x) noexcept {
+template <traits::SignedScalar T> consteval bool signbit_impl(T x) noexcept {
     if constexpr (std::integral<T>) {
         return x < T{0};
     }
@@ -299,7 +305,7 @@ template <SignedScalar T> consteval bool signbit_impl(T x) noexcept {
     return (bytes.front() & sign_mask) != 0;
 }
 
-template <SignedScalar T> consteval T copysign_impl(T mag, T sgn) noexcept {
+template <traits::SignedScalar T> consteval T copysign_impl(T mag, T sgn) noexcept {
     if constexpr (std::integral<T>) {
         const T abs_mag{abs(mag)};
         return sgn < T{0} ? -abs_mag : abs_mag;
