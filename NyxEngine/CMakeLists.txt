@@ -57,4 +57,4 @@ target_include_directories(NyxEngine
     PUBLIC include
     PRIVATE ${stb_image_SOURCE_DIR}
 )
-target_sources(NyxEngine PRIVATE "include/nyx/core/math/vector.h" "include/nyx/core/application.cpp" "include/nyx/core/math/util.h")
+target_sources(NyxEngine PRIVATE "include/nyx/core/math/vec.h" "include/nyx/core/application.cpp" "include/nyx/core/math/util.h" "include/nyx/core/math/quat.h" "include/nyx/core/traits.h" "include/nyx/core/math/mat.h" "include/nyx/core/math/angle.h")
