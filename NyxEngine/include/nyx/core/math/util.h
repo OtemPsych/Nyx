@@ -21,12 +21,31 @@ template <typename T> concept SignedScalar = std::signed_integral<T> || std::flo
 template <traits::SignedScalar T> [[nodiscard]] constexpr T abs(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr T fmod(T x, T y) noexcept;
 
-template <traits::SignedScalar T> [[nodiscard]] constexpr bool signbit(T x) noexcept;
-template <traits::SignedScalar T> [[nodiscard]] constexpr T copysign(T mag, T sgn) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T exp(T x) noexcept;
+template <std::floating_point T = float> [[nodiscard]] constexpr T exp2(std::integral auto num) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T log(T x) noexcept;
 
-template <std::floating_point T> [[nodiscard]] constexpr bool isnan(T val) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T pow(T x, T y) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T sqrt(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T rsqrt(T x) noexcept;
+
+template <std::floating_point T> [[nodiscard]] constexpr T sin(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T cos(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T tan(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T asin(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T acos(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T atan(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T atan2(T y, T x) noexcept;
+
+template <std::floating_point T> [[nodiscard]] constexpr T ceil(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T floor(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T trunc(T x) noexcept;
+
+template <traits::SignedScalar T> [[nodiscard]] constexpr T copysign(T mag, T sgn) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr bool isinf(T val) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr bool isnan(T val) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr bool isnormal(T val) noexcept;
+template <traits::SignedScalar T> [[nodiscard]] constexpr bool signbit(T x) noexcept;
 
 template <traits::Scalar T> [[nodiscard]] constexpr T min(T v0, T v1) noexcept;
 template <traits::Scalar T> [[nodiscard]] constexpr T max(T v0, T v1) noexcept;
@@ -34,55 +53,33 @@ template <traits::Scalar T> [[nodiscard]] constexpr T clamp(T val, T min_val, T 
 template <std::floating_point T>
 [[nodiscard]] constexpr bool approx_equal(T a, T b, std::uint_fast32_t max_ulp_factor = 100) noexcept;
 
-template <std::floating_point T> [[nodiscard]] constexpr T sqrt(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T rsqrt(T x) noexcept;
-
-template <std::floating_point T> [[nodiscard]] constexpr T trunc(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T floor(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T ceil(T x) noexcept;
-
-template <std::floating_point T> [[nodiscard]] constexpr T sin(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T cos(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T tan(T x) noexcept;
-
-template <std::floating_point T> [[nodiscard]] constexpr T asin(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T acos(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T atan(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T atan2(T y, T x) noexcept;
-
-template <std::floating_point T> [[nodiscard]] constexpr T exp(T x) noexcept;
-template <std::floating_point T = float> [[nodiscard]] constexpr T exp2(std::integral auto num) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T log(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T pow(T x, T y) noexcept;
-
 namespace detail {
 
 template <std::floating_point T> [[nodiscard]] consteval T fmod_impl(T x, T y) noexcept;
 
-template <traits::SignedScalar T> [[nodiscard]] consteval bool signbit_impl(T x) noexcept;
-template <traits::SignedScalar T> [[nodiscard]] consteval T copysign_impl(T mag, T sgn) noexcept;
-template <std::floating_point T> [[nodiscard]] consteval bool isinf_impl(T val) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T exp_impl(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T exp2_impl(std::integral auto num) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T log_impl(T x) noexcept;
 
+template <std::floating_point T> [[nodiscard]] consteval T pow_impl(T x, T y) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T sqrt_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T rsqrt_impl(T x) noexcept;
-
-template <std::floating_point T> [[nodiscard]] consteval T trunc_impl(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] consteval T floor_impl(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] consteval T ceil_impl(T x) noexcept;
 
 template <std::floating_point T> [[nodiscard]] consteval T sin_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T cos_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T tan_impl(T x) noexcept;
-
 template <std::floating_point T> [[nodiscard]] consteval T asin_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T acos_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T atan_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T atan2_impl(T y, T x) noexcept;
 
-template <std::floating_point T> [[nodiscard]] consteval T exp_impl(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] consteval T exp2_impl(std::integral auto num) noexcept;
-template <std::floating_point T> [[nodiscard]] consteval T log_impl(T x) noexcept;
-template <std::floating_point T> [[nodiscard]] consteval T pow_impl(T x, T y) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T ceil_impl(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T floor_impl(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T trunc_impl(T x) noexcept;
+
+template <traits::SignedScalar T> [[nodiscard]] consteval T copysign_impl(T mag, T sgn) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval bool isinf_impl(T val) noexcept;
+template <traits::SignedScalar T> [[nodiscard]] consteval bool signbit_impl(T x) noexcept;
 
 template <std::floating_point T> [[nodiscard]] consteval T reduce_pi(T x) noexcept;
 
@@ -102,70 +99,32 @@ template <std::floating_point T> constexpr T fmod(T x, T y) noexcept {
     return std::fmod(x, y);
 }
 
-template <traits::SignedScalar T> constexpr bool signbit(T x) noexcept {
+template <std::floating_point T> constexpr T exp(T x) noexcept {
     if consteval {
-        return detail::signbit_impl(x);
+        return detail::exp_impl(x);
     }
-    return std::signbit(x);
+    return std::exp(x);
 }
 
-template <traits::SignedScalar T> constexpr T copysign(T mag, T sgn) noexcept {
+template <std::floating_point T> constexpr T exp2(std::integral auto num) noexcept {
     if consteval {
-        return detail::copysign_impl(mag, sgn);
+        return detail::exp2_impl<T>(num);
     }
-    return std::copysign(mag, sgn);
+    return std::exp2(num);
 }
 
-template <std::floating_point T> constexpr bool isnan(T val) noexcept {
+template <std::floating_point T> constexpr T log(T x) noexcept {
     if consteval {
-        return val != val;
+        return detail::log_impl(x);
     }
-    return std::isnan(val);
+    return std::log(x);
 }
 
-template <std::floating_point T> constexpr bool isinf(T val) noexcept {
+template <std::floating_point T> constexpr T pow(T x, T y) noexcept {
     if consteval {
-        return detail::isinf_impl(val);
+        return detail::pow_impl(x, y);
     }
-    return std::isinf(val);
-}
-
-template <std::floating_point T> constexpr bool isnormal(T val) noexcept {
-    if consteval {
-        return !isnan(val) && !isinf(val) && val != T{0} && abs(val) >= std::numeric_limits<T>::min();
-    }
-    return std::isnormal(val);
-}
-
-template <traits::Scalar T> constexpr T min(T v0, T v1) noexcept {
-    if consteval {
-        return v0 < v1 ? v0 : v1;
-    }
-    return std::min(v0, v1);
-}
-
-template <traits::Scalar T> constexpr T max(T v0, T v1) noexcept {
-    if consteval {
-        return v0 > v1 ? v0 : v1;
-    }
-    return std::max(v0, v1);
-}
-
-template <traits::Scalar T> constexpr T clamp(T val, T min_val, T max_val) noexcept {
-    if consteval {
-        return max(min(val, max_val), min_val);
-    }
-    return std::clamp(val, min_val, max_val);
-}
-
-template <std::floating_point T> constexpr bool approx_equal(T a, T b, std::uint_fast32_t max_ulp_factor) noexcept {
-    if (a == b) {
-        return true;
-    }
-
-    const T diff{abs(a - b)};
-    const T norm{max(abs(a), abs(b))};
-    return diff < (norm * std::numeric_limits<T>::epsilon() * static_cast<T>(max_ulp_factor));
+    return std::pow(x, y);
 }
 
 template <std::floating_point T> constexpr T sqrt(T x) noexcept {
@@ -180,27 +139,6 @@ template <std::floating_point T> constexpr T rsqrt(T x) noexcept {
         return detail::rsqrt_impl(x);
     }
     return T{1} / std::sqrt(x);
-}
-
-template <std::floating_point T> constexpr T trunc(T x) noexcept {
-    if consteval {
-        return detail::trunc_impl(x);
-    }
-    return std::trunc(x);
-}
-
-template <std::floating_point T> constexpr T floor(T x) noexcept {
-    if consteval {
-        return detail::floor_impl(x);
-    }
-    return std::floor(x);
-}
-
-template <std::floating_point T> constexpr T ceil(T x) noexcept {
-    if consteval {
-        return detail::ceil_impl(x);
-    }
-    return std::ceil(x);
 }
 
 template <std::floating_point T> constexpr T sin(T x) noexcept {
@@ -252,32 +190,91 @@ template <std::floating_point T> constexpr T atan2(T y, T x) noexcept {
     return std::atan2(y, x);
 }
 
-template <std::floating_point T> constexpr T exp(T x) noexcept {
+template <std::floating_point T> constexpr T ceil(T x) noexcept {
     if consteval {
-        return detail::exp_impl(x);
+        return detail::ceil_impl(x);
     }
-    return std::exp(x);
+    return std::ceil(x);
 }
 
-template <std::floating_point T> constexpr T exp2(std::integral auto num) noexcept {
+template <std::floating_point T> constexpr T floor(T x) noexcept {
     if consteval {
-        return detail::exp2_impl<T>(num);
+        return detail::floor_impl(x);
     }
-    return std::exp2(num);
+    return std::floor(x);
 }
 
-template <std::floating_point T> constexpr T log(T x) noexcept {
+template <std::floating_point T> constexpr T trunc(T x) noexcept {
     if consteval {
-        return detail::log_impl(x);
+        return detail::trunc_impl(x);
     }
-    return std::log(x);
+    return std::trunc(x);
 }
 
-template <std::floating_point T> constexpr T pow(T x, T y) noexcept {
+template <traits::SignedScalar T> constexpr T copysign(T mag, T sgn) noexcept {
     if consteval {
-        return detail::pow_impl(x, y);
+        return detail::copysign_impl(mag, sgn);
     }
-    return std::pow(x, y);
+    return std::copysign(mag, sgn);
+}
+
+template <std::floating_point T> constexpr bool isinf(T val) noexcept {
+    if consteval {
+        return detail::isinf_impl(val);
+    }
+    return std::isinf(val);
+}
+
+template <std::floating_point T> constexpr bool isnan(T val) noexcept {
+    if consteval {
+        return val != val;
+    }
+    return std::isnan(val);
+}
+
+template <std::floating_point T> constexpr bool isnormal(T val) noexcept {
+    if consteval {
+        return !isnan(val) && !isinf(val) && val != T{0} && abs(val) >= std::numeric_limits<T>::min();
+    }
+    return std::isnormal(val);
+}
+
+template <traits::SignedScalar T> constexpr bool signbit(T x) noexcept {
+    if consteval {
+        return detail::signbit_impl(x);
+    }
+    return std::signbit(x);
+}
+
+template <traits::Scalar T> constexpr T min(T v0, T v1) noexcept {
+    if consteval {
+        return v0 < v1 ? v0 : v1;
+    }
+    return std::min(v0, v1);
+}
+
+template <traits::Scalar T> constexpr T max(T v0, T v1) noexcept {
+    if consteval {
+        return v0 > v1 ? v0 : v1;
+    }
+    return std::max(v0, v1);
+}
+
+template <traits::Scalar T> constexpr T clamp(T val, T min_val, T max_val) noexcept {
+    if consteval {
+        return max(min(val, max_val), min_val);
+    }
+    return std::clamp(val, min_val, max_val);
+}
+
+template <std::floating_point T> constexpr bool approx_equal(T a, T b, std::uint_fast32_t max_ulp_factor) noexcept {
+    if (a == b) {
+        return true;
+    }
+
+    const T diff{abs(a - b)};
+    const T norm{max(abs(a), abs(b))};
+    return diff < (norm * std::numeric_limits<T>::epsilon() * static_cast<T>(max_ulp_factor));
 }
 
 namespace detail {
@@ -299,45 +296,104 @@ template <std::floating_point T> consteval T fmod_impl(T x, T y) noexcept {
     return copysign(abs_x - trunc(abs_x / abs_y) * abs_y, x);
 }
 
-template <traits::SignedScalar T> consteval bool signbit_impl(T x) noexcept {
-    if constexpr (std::integral<T>) {
-        return x < T{0};
+template <std::floating_point T> consteval T exp_impl(T x) noexcept {
+    if (isnan(x)) {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+    if (x == std::numeric_limits<T>::infinity()) {
+        return x;
+    }
+    if (x == -std::numeric_limits<T>::infinity()) {
+        return T{0};
     }
 
-    using Storage = std::array<std::uint8_t, sizeof(T)>;
-    const Storage bytes{std::bit_cast<Storage>(x)};
-    constexpr std::uint8_t sign_mask{1 << 7};
-
-    if constexpr (std::endian::native == std::endian::little) {
-        return (bytes.back() & sign_mask) != 0;
+    T sum{1};
+    T current{1};
+    T n{1};
+    while (current > std::numeric_limits<T>::epsilon()) {
+        current *= x / n++;
+        sum += current;
     }
-    return (bytes.front() & sign_mask) != 0;
+    return sum;
 }
 
-template <traits::SignedScalar T> consteval T copysign_impl(T mag, T sgn) noexcept {
-    if constexpr (std::integral<T>) {
-        const T abs_mag{abs(mag)};
-        return sgn < T{0} ? -abs_mag : abs_mag;
+template <std::floating_point T> consteval T exp2_impl(std::integral auto num) noexcept {
+    if (num < 0) {
+        return T{1} / exp2<T>(-num);
     }
 
-    using Storage = std::array<std::uint8_t, sizeof(T)>;
-    Storage mag_bytes{std::bit_cast<Storage>(mag)};
-    const Storage sgn_bytes{std::bit_cast<Storage>(sgn)};
-    constexpr std::uint8_t sign_mask{1 << 7};
-
-    if constexpr (std::endian::native == std::endian::little) {
-        mag_bytes.back() = (mag_bytes.back() & ~sign_mask) | (sgn_bytes.back() & sign_mask);
-    } else {
-        mag_bytes.front() = (mag_bytes.front() & ~sign_mask) | (sgn_bytes.front() & sign_mask);
+    T base{2};
+    T result{1};
+    while (num > 0) {
+        if (num & 1) {
+            result *= base;
+        }
+        base *= base;
+        num >>= 1;
     }
-    return std::bit_cast<T>(mag_bytes);
+    return result;
 }
 
-template <std::floating_point T> consteval bool isinf_impl(T val) noexcept {
-    if constexpr (std::numeric_limits<T>::has_infinity) {
-        return val == std::numeric_limits<T>::infinity() || val == -std::numeric_limits<T>::infinity();
+template <std::floating_point T> consteval T log_impl(T x) noexcept {
+    if (isinf(x)) {
+        return x;
     }
-    return false;
+    if (isnan(x) || x < T{0}) {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+    if (x == T{0}) {
+        return -std::numeric_limits<T>::infinity();
+    }
+
+    // Initial raw range-reduction guess using Euler's constant (e)
+    T y{0};
+    T tmp{x};
+    while (tmp > std::numbers::e_v<T>) {
+        tmp /= std::numbers::e_v<T>;
+        y += T{1};
+    }
+
+    // Halley's Method (super-convergent root finder)
+    T dy;
+    do {
+        const T ey{exp(y)};
+        dy = T{2} * (x - ey) / (x + ey);
+        y += dy;
+    } while (abs(dy) > std::numeric_limits<T>::epsilon());
+
+    return y;
+}
+
+template <std::floating_point T> consteval T pow_impl(T x, T y) noexcept {
+    if (isnan(x) || isnan(y)) {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+    if (y == T{0}) { // IEEE 754 standard: x^0 = 1 (even when x := 0)
+        return T{1};
+    }
+    if (x == T{0}) {
+        if (y < T{0}) {
+            return std::numeric_limits<T>::infinity();
+        }
+        return T{0};
+    }
+
+    if (x > T{0}) {
+        return exp(y * log(x));
+    }
+
+    if (trunc(y) != y) { // non-integer exponents on negative bases yield complex numbers
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+
+    const T abs_y{abs(y)};
+    T result{exp(y * log(-x))};
+    if (abs_y >= exp2<T>(std::numeric_limits<T>::digits)) {
+        return result;
+    }
+
+    const bool is_even{fmod(abs_y, T{2}) == T{0}};
+    return is_even ? result : -result;
 }
 
 template <std::floating_point T> consteval T sqrt_impl(T x) noexcept {
@@ -365,61 +421,6 @@ template <std::floating_point T> consteval T rsqrt_impl(T x) noexcept {
         return std::numeric_limits<T>::quiet_NaN();
     }
     return T{1} / sqrt(x);
-}
-
-template <std::floating_point T> consteval T trunc_impl(T x) noexcept {
-    const T abs_x{abs(x)};
-
-    if (abs_x < static_cast<T>(std::numeric_limits<std::int_fast64_t>::max())) {
-        return static_cast<T>(static_cast<std::int_fast64_t>(x));
-    }
-    if (abs_x >= exp2<T>(std::numeric_limits<T>::digits)) {
-        return x; // guaranteed to have no fractional bits
-    }
-
-    T integer_part{exp2<T>(std::numeric_limits<T>::digits - 1)};
-    while (integer_part > abs_x) {
-        integer_part /= T{2};
-    }
-
-    T accum{0};
-    T rem{abs_x};
-    while (integer_part >= T{1}) {
-        if (rem >= integer_part) {
-            accum += integer_part;
-            rem -= integer_part;
-        }
-        integer_part /= T{2};
-    }
-    return copysign(accum, x);
-}
-
-template <std::floating_point T> consteval T floor_impl(T x) noexcept {
-    if (isnan(x) ||
-        isinf(x) ||
-        x <= static_cast<T>(std::numeric_limits<std::int_fast64_t>::min()) ||
-        x >= static_cast<T>(std::numeric_limits<std::int_fast64_t>::max())) {
-        return x;
-    }
-
-    // For negative numbers, if truncation makes the number larger (closer to 0), we subtract 1.0 to find the
-    // correct floor. (e.g., -3.5 truncated to -3.0 -> -4.0)
-    T truncated{trunc(x)};
-    return truncated > x ? truncated - T{1} : truncated;
-}
-
-template <std::floating_point T> consteval T ceil_impl(T x) noexcept {
-    if (isnan(x) ||
-        isinf(x) ||
-        x <= static_cast<T>(std::numeric_limits<std::int_fast64_t>::min()) ||
-        x >= static_cast<T>(std::numeric_limits<std::int_fast64_t>::max())) {
-        return x;
-    }
-
-    // For positive numbers, if truncation makes the number smaller, we must add 1.0 to find the correct ceiling
-    // (e.g., 3.5 truncated to 3.0 -> 4.0)
-    T truncated{trunc(x)};
-    return truncated < x ? truncated + T{1} : truncated;
 }
 
 template <std::floating_point T> consteval T sin_impl(T x) noexcept {
@@ -560,104 +561,100 @@ template <std::floating_point T> consteval T atan2_impl(T y, T x) noexcept {
     return atan(y / x) - pi;
 }
 
-template <std::floating_point T> consteval T exp_impl(T x) noexcept {
-    if (isnan(x)) {
-        return std::numeric_limits<T>::quiet_NaN();
-    }
-    if (x == std::numeric_limits<T>::infinity()) {
+template <std::floating_point T> consteval T ceil_impl(T x) noexcept {
+    if (isnan(x) ||
+        isinf(x) ||
+        x <= static_cast<T>(std::numeric_limits<std::int_fast64_t>::min()) ||
+        x >= static_cast<T>(std::numeric_limits<std::int_fast64_t>::max())) {
         return x;
     }
-    if (x == -std::numeric_limits<T>::infinity()) {
-        return T{0};
-    }
 
-    T sum{1};
-    T current{1};
-    T n{1};
-    while (current > std::numeric_limits<T>::epsilon()) {
-        current *= x / n++;
-        sum += current;
-    }
-    return sum;
+    // For positive numbers, if truncation makes the number smaller, we must add 1.0 to find the correct ceiling
+    // (e.g., 3.5 truncated to 3.0 -> 4.0)
+    T truncated{trunc(x)};
+    return truncated < x ? truncated + T{1} : truncated;
 }
 
-template <std::floating_point T> consteval T exp2_impl(std::integral auto num) noexcept {
-    if (num < 0) {
-        return T{1} / exp2<T>(-num);
-    }
-
-    T base{2};
-    T result{1};
-    while (num > 0) {
-        if (num & 1) {
-            result *= base;
-        }
-        base *= base;
-        num >>= 1;
-    }
-    return result;
-}
-
-template <std::floating_point T> consteval T log_impl(T x) noexcept {
-    if (isinf(x)) {
+template <std::floating_point T> consteval T floor_impl(T x) noexcept {
+    if (isnan(x) ||
+        isinf(x) ||
+        x <= static_cast<T>(std::numeric_limits<std::int_fast64_t>::min()) ||
+        x >= static_cast<T>(std::numeric_limits<std::int_fast64_t>::max())) {
         return x;
     }
-    if (isnan(x) || x < T{0}) {
-        return std::numeric_limits<T>::quiet_NaN();
-    }
-    if (x == T{0}) {
-        return -std::numeric_limits<T>::infinity();
-    }
 
-    // Initial raw range-reduction guess using Euler's constant (e)
-    T y{0};
-    T tmp{x};
-    while (tmp > std::numbers::e_v<T>) {
-        tmp /= std::numbers::e_v<T>;
-        y += T{1};
-    }
-
-    // Halley's Method (super-convergent root finder)
-    T dy;
-    do {
-        const T ey{exp(y)};
-        dy = T{2} * (x - ey) / (x + ey);
-        y += dy;
-    } while (abs(dy) > std::numeric_limits<T>::epsilon());
-
-    return y;
+    // For negative numbers, if truncation makes the number larger (closer to 0), we subtract 1.0 to find the
+    // correct floor. (e.g., -3.5 truncated to -3.0 -> -4.0)
+    T truncated{trunc(x)};
+    return truncated > x ? truncated - T{1} : truncated;
 }
 
-template <std::floating_point T> consteval T pow_impl(T x, T y) noexcept {
-    if (isnan(x) || isnan(y)) {
-        return std::numeric_limits<T>::quiet_NaN();
+template <std::floating_point T> consteval T trunc_impl(T x) noexcept {
+    const T abs_x{abs(x)};
+
+    if (abs_x < static_cast<T>(std::numeric_limits<std::int_fast64_t>::max())) {
+        return static_cast<T>(static_cast<std::int_fast64_t>(x));
     }
-    if (y == T{0}) { // IEEE 754 standard: x^0 = 1 (even when x := 0)
-        return T{1};
+    if (abs_x >= exp2<T>(std::numeric_limits<T>::digits)) {
+        return x; // guaranteed to have no fractional bits
     }
-    if (x == T{0}) {
-        if (y < T{0}) {
-            return std::numeric_limits<T>::infinity();
+
+    T integer_part{exp2<T>(std::numeric_limits<T>::digits - 1)};
+    while (integer_part > abs_x) {
+        integer_part /= T{2};
+    }
+
+    T accum{0};
+    T rem{abs_x};
+    while (integer_part >= T{1}) {
+        if (rem >= integer_part) {
+            accum += integer_part;
+            rem -= integer_part;
         }
-        return T{0};
+        integer_part /= T{2};
+    }
+    return copysign(accum, x);
+}
+
+template <traits::SignedScalar T> consteval T copysign_impl(T mag, T sgn) noexcept {
+    if constexpr (std::integral<T>) {
+        const T abs_mag{abs(mag)};
+        return sgn < T{0} ? -abs_mag : abs_mag;
     }
 
-    if (x > T{0}) {
-        return exp(y * log(x));
+    using Storage = std::array<std::uint8_t, sizeof(T)>;
+    Storage mag_bytes{std::bit_cast<Storage>(mag)};
+    const Storage sgn_bytes{std::bit_cast<Storage>(sgn)};
+    constexpr std::uint8_t sign_mask{1 << 7};
+
+    if constexpr (std::endian::native == std::endian::little) {
+        mag_bytes.back() = (mag_bytes.back() & ~sign_mask) | (sgn_bytes.back() & sign_mask);
+    } else {
+        mag_bytes.front() = (mag_bytes.front() & ~sign_mask) | (sgn_bytes.front() & sign_mask);
+    }
+    return std::bit_cast<T>(mag_bytes);
+}
+
+template <std::floating_point T> consteval bool isinf_impl(T val) noexcept {
+    if constexpr (std::numeric_limits<T>::has_infinity) {
+        return val == std::numeric_limits<T>::infinity() || val == -std::numeric_limits<T>::infinity();
+    }
+    return false;
+}
+
+template <traits::SignedScalar T> consteval bool signbit_impl(T x) noexcept {
+    if constexpr (std::integral<T>) {
+        return x < T{0};
     }
 
-    if (trunc(y) != y) { // non-integer exponents on negative bases yield complex numbers
-        return std::numeric_limits<T>::quiet_NaN();
-    }
+    using Storage = std::array<std::uint8_t, sizeof(T)>;
+    const Storage bytes{std::bit_cast<Storage>(x)};
+    constexpr std::uint8_t sign_mask{1 << 7};
 
-    const T abs_y{abs(y)};
-    T result{exp(y * log(-x))};
-    if (abs_y >= exp2<T>(std::numeric_limits<T>::digits)) {
-        return result;
+    if constexpr (std::endian::native == std::endian::little) {
+        return (bytes.back() & sign_mask) != 0;
     }
-
-    const bool is_even{fmod(abs_y, T{2}) == T{0}};
-    return is_even ? result : -result;
+    return (bytes.front() & sign_mask) != 0;
 }
 
 template <std::floating_point T> consteval T reduce_pi(T x) noexcept {
