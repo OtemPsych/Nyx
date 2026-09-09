@@ -17,6 +17,7 @@ template <std::floating_point T = double> class Angle {
     [[nodiscard]] static constexpr Angle asin(T rad) noexcept;
     [[nodiscard]] static constexpr Angle acos(T rad) noexcept;
     [[nodiscard]] static constexpr Angle atan(T rad) noexcept;
+    [[nodiscard]] static constexpr Angle atan2(T y, T x) noexcept;
 
     [[nodiscard]] static constexpr Angle delta(Angle from, Angle to) noexcept;
     [[nodiscard]] static constexpr Angle distance(Angle a, Angle b) noexcept;
@@ -79,6 +80,10 @@ template <std::floating_point T> constexpr Angle<T> Angle<T>::asin(T rad) noexce
 template <std::floating_point T> constexpr Angle<T> Angle<T>::acos(T rad) noexcept { return Angle{nyx::acos(rad)}; }
 
 template <std::floating_point T> constexpr Angle<T> Angle<T>::atan(T rad) noexcept { return Angle{nyx::atan(rad)}; }
+
+template <std::floating_point T> constexpr Angle<T> Angle<T>::atan2(T y, T x) noexcept {
+    return Angle{nyx::atan2(y, x)};
+}
 
 template <std::floating_point T> constexpr Angle<T> Angle<T>::delta(Angle from, Angle to) noexcept {
     return (to - from).wrap_pi();
