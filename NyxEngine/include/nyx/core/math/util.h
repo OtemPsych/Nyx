@@ -48,6 +48,7 @@ template <std::floating_point T> [[nodiscard]] constexpr T tan(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr T asin(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr T acos(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr T atan(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] constexpr T atan2(T y, T x) noexcept;
 
 template <std::floating_point T> [[nodiscard]] constexpr T exp(T x) noexcept;
 template <std::floating_point T = float> [[nodiscard]] constexpr T exp2(std::integral auto num) noexcept;
@@ -76,6 +77,7 @@ template <std::floating_point T> [[nodiscard]] consteval T tan_impl(T x) noexcep
 template <std::floating_point T> [[nodiscard]] consteval T asin_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T acos_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T atan_impl(T x) noexcept;
+template <std::floating_point T> [[nodiscard]] consteval T atan2_impl(T y, T x) noexcept;
 
 template <std::floating_point T> [[nodiscard]] consteval T exp_impl(T x) noexcept;
 template <std::floating_point T> [[nodiscard]] consteval T exp2_impl(std::integral auto num) noexcept;
@@ -241,6 +243,13 @@ template <std::floating_point T> constexpr T atan(T x) noexcept {
         return detail::atan_impl(x);
     }
     return std::atan(x);
+}
+
+template <std::floating_point T> constexpr T atan2(T y, T x) noexcept {
+    if consteval {
+        return detail::atan2_impl(y, x);
+    }
+    return std::atan2(y, x);
 }
 
 template <std::floating_point T> constexpr T exp(T x) noexcept {
@@ -512,6 +521,45 @@ template <std::floating_point T> consteval T atan_impl(T x) noexcept {
     return sum;
 }
 
+template <std::floating_point T> consteval T atan2_impl(T y, T x) noexcept {
+    constexpr T pi{std::numbers::pi_v<T>};
+
+    // Handle IEEE floating-point arithmetic (IEC 60559) errors
+    if (isnan(y) || isnan(x)) {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+    if (isinf(y)) {
+        if (x == -std::numeric_limits<T>::infinity()) {
+            return copysign(T{3} * pi / T{4}, y);
+        }
+        if (x == std::numeric_limits<T>::infinity()) {
+            return copysign(pi / T{4}, y);
+        }
+        return copysign(pi / T{2}, y);
+    }
+    if (x == -std::numeric_limits<T>::infinity()) {
+        return copysign(pi, y);
+    }
+    if (x == std::numeric_limits<T>::infinity()) {
+        return copysign(T{0}, y);
+    }
+    if (y == T{0}) {
+        return copysign(signbit(x) ? pi : T{0}, y);
+    }
+    if (x == T{0}) {
+        return copysign(pi / T{2}, y);
+    }
+
+    // General cases
+    if (x > T{0}) {
+        return atan(y / x);
+    }
+    if (y > T{0}) {
+        return atan(y / x) + pi;
+    }
+    return atan(y / x) - pi;
+}
+
 template <std::floating_point T> consteval T exp_impl(T x) noexcept {
     if (isnan(x)) {
         return std::numeric_limits<T>::quiet_NaN();
@@ -618,7 +666,7 @@ template <std::floating_point T> consteval T reduce_pi(T x) noexcept {
     }
 
     constexpr T pi{std::numbers::pi_v<T>};
-    constexpr T pi2{pi * 2};
+    constexpr T pi2{pi * T{2}};
 
     const T abs_x{abs(x)};
     if (abs_x <= pi) {
