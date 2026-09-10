@@ -268,13 +268,9 @@ template <traits::Scalar T> constexpr T clamp(T val, T min_val, T max_val) noexc
 }
 
 template <std::floating_point T> constexpr bool approx_equal(T a, T b, std::uint_fast32_t max_ulp_factor) noexcept {
-    if (a == b) {
-        return true;
-    }
-
-    const T diff{abs(a - b)};
-    const T norm{max(abs(a), abs(b))};
-    return diff < (norm * std::numeric_limits<T>::epsilon() * static_cast<T>(max_ulp_factor));
+    return a == b || abs(a - b) <= std::numeric_limits<T>::epsilon() *
+                                       max(T{1}, max(abs(a), abs(b))) *
+                                       static_cast<T>(max_ulp_factor);
 }
 
 namespace detail {
@@ -319,7 +315,7 @@ template <std::floating_point T> consteval T exp_impl(T x) noexcept {
 
 template <std::floating_point T> consteval T exp2_impl(std::integral auto num) noexcept {
     if (num < 0) {
-        return T{1} / exp2<T>(-num);
+        return T{1} / exp2_impl<T>(-num);
     }
 
     T base{2};
