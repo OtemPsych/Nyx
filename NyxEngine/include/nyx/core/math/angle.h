@@ -11,6 +11,9 @@ namespace nyx {
 
 template <std::floating_point T = double> class Angle {
   public:
+    using value_type = T;
+
+  public:
     [[nodiscard]] static constexpr Angle radians(T rad) noexcept;
     [[nodiscard]] static constexpr Angle degrees(T deg) noexcept;
 
@@ -34,6 +37,13 @@ template <std::floating_point T = double> class Angle {
     constexpr Angle& operator/=(T factor) noexcept;
     constexpr Angle& operator%=(Angle rhs) noexcept;
 
+    [[nodiscard]] constexpr Angle operator+(this Angle lhs, Angle rhs) noexcept;
+    [[nodiscard]] constexpr Angle operator-(this Angle lhs, Angle rhs) noexcept;
+    [[nodiscard]] constexpr Angle operator*(this Angle self, T factor) noexcept;
+    [[nodiscard]] constexpr Angle operator/(this Angle self, T factor) noexcept;
+    [[nodiscard]] constexpr T operator/(Angle rhs) const noexcept;
+    [[nodiscard]] constexpr Angle operator%(this Angle lhs, Angle rhs) noexcept;
+
     [[nodiscard]] friend constexpr auto operator<=>(Angle, Angle) noexcept = default;
 
     [[nodiscard]] constexpr T radians() const noexcept;
@@ -52,13 +62,11 @@ template <std::floating_point T = double> class Angle {
     T rad_{};
 };
 
-template <std::floating_point T> [[nodiscard]] constexpr Angle<T> operator+(Angle<T> lhs, Angle<T> rhs) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr Angle<T> operator-(Angle<T> lhs, Angle<T> rhs) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr Angle<T> operator*(Angle<T> angle, T factor) noexcept;
 template <std::floating_point T> [[nodiscard]] constexpr Angle<T> operator*(T factor, Angle<T> angle) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr Angle<T> operator/(Angle<T> angle, T factor) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr T operator/(Angle<T> lhs, Angle<T> rhs) noexcept;
-template <std::floating_point T> [[nodiscard]] constexpr Angle<T> operator%(Angle<T> lhs, Angle<T> rhs) noexcept;
+
+using Anglef = Angle<float>;
+using Angled = Angle<double>;
+using Angleld = Angle<long double>;
 
 namespace literals {
 
@@ -66,6 +74,21 @@ namespace literals {
 [[nodiscard]] constexpr Angle<> operator""_deg(unsigned long long deg) noexcept;
 [[nodiscard]] constexpr Angle<> operator""_rad(long double rad) noexcept;
 [[nodiscard]] constexpr Angle<> operator""_rad(unsigned long long rad) noexcept;
+
+[[nodiscard]] constexpr Angle<float> operator""_degf(long double deg) noexcept;
+[[nodiscard]] constexpr Angle<float> operator""_degf(unsigned long long deg) noexcept;
+[[nodiscard]] constexpr Angle<float> operator""_radf(long double rad) noexcept;
+[[nodiscard]] constexpr Angle<float> operator""_radf(unsigned long long rad) noexcept;
+
+[[nodiscard]] constexpr Angle<double> operator""_degd(long double deg) noexcept;
+[[nodiscard]] constexpr Angle<double> operator""_degd(unsigned long long deg) noexcept;
+[[nodiscard]] constexpr Angle<double> operator""_radd(long double rad) noexcept;
+[[nodiscard]] constexpr Angle<double> operator""_radd(unsigned long long rad) noexcept;
+
+[[nodiscard]] constexpr Angle<long double> operator""_degld(long double deg) noexcept;
+[[nodiscard]] constexpr Angle<long double> operator""_degld(unsigned long long deg) noexcept;
+[[nodiscard]] constexpr Angle<long double> operator""_radld(long double rad) noexcept;
+[[nodiscard]] constexpr Angle<long double> operator""_radld(unsigned long long rad) noexcept;
 
 } // namespace literals
 
@@ -128,6 +151,38 @@ template <std::floating_point T> constexpr Angle<T>& Angle<T>::operator%=(Angle 
     return *this;
 }
 
+template <std::floating_point T> constexpr Angle<T> Angle<T>::operator+(this Angle lhs, Angle rhs) noexcept {
+    lhs += rhs;
+    return lhs;
+}
+
+template <std::floating_point T> constexpr Angle<T> Angle<T>::operator-(this Angle lhs, Angle rhs) noexcept {
+    lhs -= rhs;
+    return lhs;
+}
+
+template <std::floating_point T> constexpr Angle<T> Angle<T>::operator*(this Angle self, T factor) noexcept {
+    self *= factor;
+    return self;
+}
+
+template <std::floating_point T> constexpr Angle<T> Angle<T>::operator/(this Angle self, T factor) noexcept {
+    assert(factor != T{0} && "Division by zero");
+    self /= factor;
+    return self;
+}
+
+template <std::floating_point T> constexpr T Angle<T>::operator/(Angle rhs) const noexcept {
+    assert(rhs.rad_ != T{0} && "Division by zero");
+    return rad_ / rhs.rad_;
+}
+
+template <std::floating_point T> constexpr Angle<T> Angle<T>::operator%(this Angle lhs, Angle rhs) noexcept {
+    assert(rhs.rad_ != T{0} && "Modulo by zero");
+    lhs %= rhs;
+    return lhs;
+}
+
 template <std::floating_point T> constexpr T Angle<T>::radians() const noexcept { return rad_; }
 
 template <std::floating_point T> constexpr T Angle<T>::degrees() const noexcept {
@@ -163,52 +218,60 @@ template <std::floating_point T> constexpr Angle<T> Angle<T>::wrap_tau() const n
 
 template <std::floating_point T> constexpr Angle<T>::Angle(T rad) noexcept : rad_{rad} {}
 
-template <std::floating_point T> constexpr Angle<T> operator+(Angle<T> lhs, Angle<T> rhs) noexcept {
-    lhs += rhs;
-    return lhs;
-}
-
-template <std::floating_point T> constexpr Angle<T> operator-(Angle<T> lhs, Angle<T> rhs) noexcept {
-    lhs -= rhs;
-    return lhs;
-}
-
-template <std::floating_point T> constexpr Angle<T> operator*(Angle<T> angle, T factor) noexcept {
-    angle *= factor;
-    return angle;
-}
-
 template <std::floating_point T> constexpr Angle<T> operator*(T factor, Angle<T> angle) noexcept {
     angle *= factor;
     return angle;
 }
 
-template <std::floating_point T> constexpr Angle<T> operator/(Angle<T> angle, T factor) noexcept {
-    assert(factor != T{0} && "Division by zero");
-    angle /= factor;
-    return angle;
-}
-
-template <std::floating_point T> constexpr T operator/(Angle<T> lhs, Angle<T> rhs) noexcept {
-    assert(rhs.radians() != T{0} && "Division by zero");
-    return lhs.radians() / rhs.radians();
-}
-
-template <std::floating_point T> constexpr Angle<T> operator%(Angle<T> lhs, Angle<T> rhs) noexcept {
-    assert(rhs.radians() != T{0} && "Modulo by zero");
-    lhs %= rhs;
-    return lhs;
-}
-
 namespace literals {
 
-constexpr Angle<> operator""_deg(long double deg) noexcept { return Angle<>::degrees(static_cast<double>(deg)); }
+constexpr Angle<> operator""_deg(long double deg) noexcept {
+    return Angle<>::degrees(static_cast<Angle<>::value_type>(deg));
+}
+constexpr Angle<> operator""_deg(unsigned long long deg) noexcept {
+    return Angle<>::degrees(static_cast<Angle<>::value_type>(deg));
+}
+constexpr Angle<> operator""_rad(long double rad) noexcept {
+    return Angle<>::radians(static_cast<Angle<>::value_type>(rad));
+}
+constexpr Angle<> operator""_rad(unsigned long long rad) noexcept {
+    return Angle<>::radians(static_cast<Angle<>::value_type>(rad));
+}
 
-constexpr Angle<> operator""_deg(unsigned long long deg) noexcept { return Angle<>::degrees(static_cast<double>(deg)); }
+constexpr Angle<float> operator""_degf(long double deg) noexcept {
+    return Angle<float>::degrees(static_cast<float>(deg));
+}
+constexpr Angle<float> operator""_degf(unsigned long long deg) noexcept {
+    return Angle<float>::degrees(static_cast<float>(deg));
+}
+constexpr Angle<float> operator""_radf(long double rad) noexcept {
+    return Angle<float>::radians(static_cast<float>(rad));
+}
+constexpr Angle<float> operator""_radf(unsigned long long rad) noexcept {
+    return Angle<float>::radians(static_cast<float>(rad));
+}
 
-constexpr Angle<> operator""_rad(long double rad) noexcept { return Angle<>::radians(static_cast<double>(rad)); }
+constexpr Angle<double> operator""_degd(long double deg) noexcept {
+    return Angle<double>::degrees(static_cast<double>(deg));
+}
+constexpr Angle<double> operator""_degd(unsigned long long deg) noexcept {
+    return Angle<double>::degrees(static_cast<double>(deg));
+}
+constexpr Angle<double> operator""_radd(long double rad) noexcept {
+    return Angle<double>::radians(static_cast<double>(rad));
+}
+constexpr Angle<double> operator""_radd(unsigned long long rad) noexcept {
+    return Angle<double>::radians(static_cast<double>(rad));
+}
 
-constexpr Angle<> operator""_rad(unsigned long long rad) noexcept { return Angle<>::radians(static_cast<double>(rad)); }
+constexpr Angle<long double> operator""_degld(long double deg) noexcept { return Angle<long double>::degrees(deg); }
+constexpr Angle<long double> operator""_degld(unsigned long long deg) noexcept {
+    return Angle<long double>::degrees(static_cast<long double>(deg));
+}
+constexpr Angle<long double> operator""_radld(long double rad) noexcept { return Angle<long double>::radians(rad); }
+constexpr Angle<long double> operator""_radld(unsigned long long rad) noexcept {
+    return Angle<long double>::radians(static_cast<long double>(rad));
+}
 
 } // namespace literals
 
