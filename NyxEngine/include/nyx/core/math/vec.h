@@ -128,7 +128,7 @@ template <traits::Scalar T, std::size_t N> struct vec : public detail::vec_stora
 
     [[nodiscard]] constexpr T length_sq() const noexcept;
     [[nodiscard]] constexpr T length() const noexcept;
-    [[nodiscard]] constexpr vec norm(this vec self) noexcept requires std::floating_point<T>;
+    [[nodiscard]] constexpr vec norm() const noexcept requires std::floating_point<T>;
 };
 
 template <typename T, std::size_t N> [[nodiscard]] constexpr vec<T, N> operator*(T scalar, vec<T, N> v) noexcept;
@@ -620,11 +620,11 @@ template <traits::Scalar T, std::size_t N> constexpr T vec<T, N>::length_sq() co
 template <traits::Scalar T, std::size_t N> constexpr T vec<T, N>::length() const noexcept { return sqrt(length_sq()); }
 
 template <traits::Scalar T, std::size_t N>
-constexpr vec<T, N> vec<T, N>::norm(this vec self) noexcept requires std::floating_point<T> {
-    if (const T len{self.length()}; len > T{0}) {
-        self *= T{1} / len;
+constexpr vec<T, N> vec<T, N>::norm() const noexcept requires std::floating_point<T> {
+    if (const T len{length()}; len > T{0}) {
+        return *this * (T{1} / len);
     }
-    return self;
+    return *this;
 }
 
 template <typename T, std::size_t N> constexpr vec<T, N> operator*(T scalar, vec<T, N> v) noexcept {
