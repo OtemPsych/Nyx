@@ -13,8 +13,8 @@ namespace nyx {
 template <std::floating_point T> struct quat {
     T x{0}, y{0}, z{0}, w{0};
 
-    [[nodiscard]] static constexpr quat from(vec3<T> start, vec3<T> end) noexcept;
-    [[nodiscard]] static constexpr quat from(vec3<T> axis, Angle<T> angle) noexcept;
+    [[nodiscard]] static constexpr quat from(const vec3<T>& start, const vec3<T>& end) noexcept;
+    [[nodiscard]] static constexpr quat from(const vec3<T>& axis, Angle<T> angle) noexcept;
     [[nodiscard]] static constexpr quat from(Angle<T> pitch, Angle<T> yaw, Angle<T> roll) noexcept;
 
     [[nodiscard]] static constexpr T dot(const quat& q0, const quat& q1) noexcept;
@@ -56,9 +56,9 @@ using quatf = quat<float>;
 using quatd = quat<double>;
 using quatld = quat<long double>;
 
-template <std::floating_point T> constexpr quat<T> quat<T>::from(vec3<T> start, vec3<T> end) noexcept {
-    start = start.norm();
-    end = end.norm();
+template <std::floating_point T> constexpr quat<T> quat<T>::from(const vec3<T>& start, const vec3<T>& end) noexcept {
+    assert(start == start.norm() && "Vector start should be normalized");
+    assert(end == end.norm() && "Vector end should be normalized");
 
     const T dot{vec3<T>::dot(start, end)};
 
@@ -79,8 +79,9 @@ template <std::floating_point T> constexpr quat<T> quat<T>::from(vec3<T> start, 
     return {cross.x * m_inv, cross.y * m_inv, cross.z * m_inv, m * T{0.5}};
 }
 
-template <std::floating_point T> constexpr quat<T> quat<T>::from(vec3<T> axis, Angle<T> angle) noexcept {
-    axis = axis.norm();
+template <std::floating_point T> constexpr quat<T> quat<T>::from(const vec3<T>& axis, Angle<T> angle) noexcept {
+    assert(axis == axis.norm() && "Vector axis should be normalized");
+
     angle *= T{0.5};
 
     const T s{angle.sin()};
